@@ -6,7 +6,7 @@ public class Student implements HasId<Long> {
     private String firstName;
     private String lastName;
 
-    public Student(Long id, int groupId, String firstName, String lastName) {
+    public Student(Long id, Integer groupId, String firstName, String lastName) {
         this.id = id;
         this.groupId = groupId;
         this.firstName = firstName;
@@ -27,7 +27,7 @@ public class Student implements HasId<Long> {
         return id;
     }
 
-    public int getGroupId() {
+    public Integer getGroupId() {
         return groupId;
     }
 
