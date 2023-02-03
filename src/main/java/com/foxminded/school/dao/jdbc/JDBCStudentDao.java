@@ -1,92 +1,71 @@
 package com.foxminded.school.dao.jdbc;
 
-import com.foxminded.school.Database;
 import com.foxminded.school.dao.AbstractCrudDao;
 import com.foxminded.school.dao.StudentDao;
-import com.foxminded.school.model.Student;
+import com.foxminded.school.model.student.Student;
+import com.foxminded.school.model.student.StudentMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class JDBCStudentDao extends AbstractCrudDao<Student, Long> implements StudentDao {
-    private static final String INSERT = "INSERT INTO students (group_id, first_name, last_name) values (?,?,?)";
     private static final String UPDATE = "UPDATE students SET group_id = ?, first_name = ?, last_name = ? where id = ?";
     private static final String SELECT_ALL = "SELECT * FROM students";
     private static final String SELECT = "SELECT * FROM STUDENTS WHERE id=?";
     private static final String DELETE = "DELETE FROM students WHERE id = ?";
+    private final JdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
+
+
+    public JDBCStudentDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("students")
+                .usingColumns("group_id", "first_name", "last_name")
+                .usingGeneratedKeyColumns("id");
+    }
+
+
     @Override
-    protected Student create(Student entity) throws SQLException {
-        try (Connection connection = Database.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
-                preparedStatement.setObject(1, entity.getGroupId());
-                preparedStatement.setString(2, entity.getFirstName());
-                preparedStatement.setString(3, entity.getLastName());
-                preparedStatement.execute();
-                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        entity.setId(generatedKeys.getLong(1));
-                    } else {
-                        throw new SQLException("Creating of student failed, no ID obtained.");
-                    }
-                }
-                return entity;
-            }
+    protected Student create(Student entity) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("group_id", entity.getGroupId())
+                .addValue("first_name", entity.getFirstName())
+                .addValue("last_name", entity.getLastName());
+        Number newId = simpleJdbcInsert.executeAndReturnKey(params);
+        entity.setId(newId.longValue());
+        return entity;
+    }
+
+
+
+    @Override
+    protected Student update(Student entity) {
+        jdbcTemplate.update(UPDATE,
+                entity.getGroupId(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getId());
+        return entity;
         }
+
+    @Override
+    public Optional<Student> findById(Long id) {
+        return Optional.ofNullable(jdbcTemplate.queryForObject(SELECT, new StudentMapper(), id));
     }
 
     @Override
-    protected Student update(Student entity) throws SQLException {
-        try (Connection connection = Database.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE)) {
-                preparedStatement.setInt(1, entity.getGroupId());
-                preparedStatement.setString(2, entity.getFirstName());
-                preparedStatement.setString(3, entity.getLastName());
-                preparedStatement.setLong(4, entity.getId());
-                preparedStatement.execute();
-                return entity;
-            }
-        }
+    public List<Student> findAll() {
+        return jdbcTemplate.query(SELECT_ALL, new StudentMapper());
     }
 
     @Override
-    public Optional<Student> findById(Long id) throws SQLException {
-        try (Connection connection = Database.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT, Statement.RETURN_GENERATED_KEYS)) {
-                preparedStatement.setLong(1, id);
-                try (ResultSet rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {
-                        return Optional.of(new Student(rs.getLong(1), rs.getInt(2), rs.getString(3), rs.getString(4)));
-                    }
-                    else return Optional.empty();
-                }
-            }
-        }
-    }
-
-    @Override
-    public List<Student> findAll() throws SQLException {
-        try (Connection connection = Database.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL)) {
-                try (ResultSet rs = preparedStatement.executeQuery()) {
-                    List<Student> students = new ArrayList<>();
-                    while (rs.next()) {
-                        students.add(new Student(rs.getLong("id"), rs.getInt("group_id"), rs.getString("first_name"), rs.getString("last_name")));
-                    }
-                    return students;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void deleteById(Long id) throws SQLException {
-        try (Connection connection = Database.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
-                preparedStatement.setLong(1, id);
-                preparedStatement.execute();
-            }
-        }
+    public void deleteById(Long id) {
+        jdbcTemplate.update(DELETE, id);
     }
 }

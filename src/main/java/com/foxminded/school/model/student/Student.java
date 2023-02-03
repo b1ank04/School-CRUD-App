@@ -1,10 +1,12 @@
-package com.foxminded.school.model;
+package com.foxminded.school.model.student;
+
+import com.foxminded.school.model.HasId;
 
 public class Student implements HasId<Long> {
     private Long id;
-    private Integer groupId;
-    private String firstName;
-    private String lastName;
+    private final Integer groupId;
+    private final String firstName;
+    private final String lastName;
 
     public Student(Long id, Integer groupId, String firstName, String lastName) {
         this.id = id;
@@ -42,15 +44,4 @@ public class Student implements HasId<Long> {
         this.id = id;
     }
 
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 }

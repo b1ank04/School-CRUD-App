@@ -1,11 +1,14 @@
 package com.foxminded.school;
 
 import com.foxminded.school.dao.jdbc.JDBCStudentDao;
-import com.foxminded.school.model.Student;
+import com.foxminded.school.model.student.Student;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -13,13 +16,16 @@ import java.util.Scanner;
 @SpringBootApplication
 public class SchoolApplication implements CommandLineRunner {
 
+    @Autowired
+    DataSource dataSource;
+
     public static void main(String[] args) {
         SpringApplication.run(SchoolApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
-        JDBCStudentDao studentDao = new JDBCStudentDao();
+        JDBCStudentDao studentDao = new JDBCStudentDao(new JdbcTemplate(dataSource));
         try (Scanner sc = new Scanner(System.in)) {
             System.out.println("""
                     Please choose the method you want to use:
