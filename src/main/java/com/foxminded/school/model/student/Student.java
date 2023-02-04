@@ -2,6 +2,8 @@ package com.foxminded.school.model.student;
 
 import com.foxminded.school.model.HasId;
 
+import java.util.Objects;
+
 public class Student implements HasId<Long> {
     private Long id;
     private final Integer groupId;
@@ -13,6 +15,18 @@ public class Student implements HasId<Long> {
         this.groupId = groupId;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student student)) return false;
+        return Objects.equals(getId(), student.getId()) && Objects.equals(getGroupId(), student.getGroupId()) && Objects.equals(getFirstName(), student.getFirstName()) && Objects.equals(getLastName(), student.getLastName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getGroupId(), getFirstName(), getLastName());
     }
 
     @Override
