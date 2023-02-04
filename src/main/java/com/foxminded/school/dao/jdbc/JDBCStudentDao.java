@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,18 +46,24 @@ public class JDBCStudentDao extends AbstractCrudDao<Student, Long> implements St
 
 
     @Override
-    protected Student update(Student entity) {
-        jdbcTemplate.update(UPDATE,
+    protected Student update(Student entity) throws SQLException {
+        int update = jdbcTemplate.update(UPDATE,
                 entity.getGroupId(),
                 entity.getFirstName(),
                 entity.getLastName(),
                 entity.getId());
+        if (update != 1) throw new SQLException("Student doesn't exist");
         return entity;
-        }
+    }
 
     @Override
     public Optional<Student> findById(Long id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(SELECT, new StudentMapper(), id));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(SELECT, new StudentMapper(), id));
+        }
+        catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -65,7 +72,10 @@ public class JDBCStudentDao extends AbstractCrudDao<Student, Long> implements St
     }
 
     @Override
-    public void deleteById(Long id) {
-        jdbcTemplate.update(DELETE, id);
+    public void deleteById(Long id) throws SQLException {
+        int update = jdbcTemplate.update(DELETE, id);
+        if (update != 1) {
+            throw new SQLException("Student doesn't exist");
+        }
     }
 }
