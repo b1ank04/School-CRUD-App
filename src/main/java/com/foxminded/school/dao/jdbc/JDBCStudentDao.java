@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class JDBCStudentDao extends AbstractCrudDao<Student, Long> implements StudentDao {
@@ -95,16 +94,20 @@ public class JDBCStudentDao extends AbstractCrudDao<Student, Long> implements St
     }
 
     @Override
-    public void addCourse(Long studentId, Long courseId) {
+    public void addCourse(Long studentId, Long courseId) throws SQLException {
         List<Long> idList = findRelatedCourses(studentId).stream().map(Course::getId).toList();
-        if (idList.contains(courseId)) throw new IllegalArgumentException("Course was added before");
-        jdbcTemplate.update(ADD_COURSE, studentId, courseId);
+        if (idList.contains(courseId)) throw new IllegalArgumentException(String.format("Course with id=%s was added before", courseId));
+        try {
+            jdbcTemplate.update(ADD_COURSE, studentId, courseId);
+        } catch (Exception ignored) {
+            throw new SQLException("Student or Course doesn't exist");
+        }
     }
 
     @Override
     public void deleteCourse(Long studentId, Long courseId) {
         List<Long> idList = findRelatedCourses(studentId).stream().map(Course::getId).toList();
-        if (!idList.contains(courseId)) throw new IllegalArgumentException("Course was not added before");
+        if (!idList.contains(courseId)) throw new IllegalArgumentException(String.format("Course with id=%s was not added before", courseId));
         jdbcTemplate.update(DELETE_COURSE, studentId, courseId);
     }
 }

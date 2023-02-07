@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS students(
     group_id INT,
     first_name VARCHAR(20),
     last_name VARCHAR(20),
-    FOREIGN KEY(group_id) references groups(id)
+    FOREIGN KEY(group_id) references groups(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS courses(
@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS courses(
 CREATE TABLE IF NOT EXISTS student_course(
     student_id INT,
     course_id INT,
-    FOREIGN KEY (student_id) references students(id),
-    FOREIGN KEY (course_id) references courses(id)
+    FOREIGN KEY (student_id) references students(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) references courses(id) ON DELETE CASCADE
 );

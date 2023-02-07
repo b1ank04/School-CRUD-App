@@ -41,7 +41,7 @@ public class JDBCGroupDao extends AbstractCrudDao<Group, Long> implements GroupD
 
     @Override
     protected Group update(Group entity) throws SQLException {
-        int update = jdbcTemplate.update(UPDATE, entity.getName());
+        int update = jdbcTemplate.update(UPDATE, entity.getName(), entity.getId());
         if (update != 1) throw new SQLException("Group doesn't exist");
         return entity;
     }

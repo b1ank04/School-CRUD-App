@@ -1,6 +1,7 @@
 package com.foxminded.school.dao.jdbc;
 
 import com.foxminded.school.dao.modeldao.StudentDao;
+import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,4 +87,44 @@ class JDBCStudentDaoTest {
         assertEquals("Student doesn't exist", thrown.getMessage());
     }
 
+    @Test
+    void shouldFindRelatedCourses() {
+        List<Course> courses = List.of(new Course(1000L, "test", null), new Course(1001L, "test1", null));
+        assertEquals(courses, dao.findRelatedCourses(1000L));
+    }
+
+    @Test
+    void shouldNotFindRelatedCourses() {
+        dao.deleteCourse(1000L,1000L);
+        dao.deleteCourse(1000L, 1001L);
+        assertEquals(new ArrayList<>(), dao.findRelatedCourses(1000L));
+    }
+
+    @Test
+    void shouldAddCourse() {
+        assertDoesNotThrow(() -> dao.addCourse(1000L, 500L));
+    }
+
+    @Test
+    void shouldNotAddBeforeAddedCourse() {
+        Exception thrown = assertThrows(IllegalArgumentException.class, () -> dao.addCourse(1000L,1000L));
+        assertEquals("Course with id=1000 was added before", thrown.getMessage());
+    }
+
+    @Test
+    void shouldNotAddWrongCourseOrStudent() {
+        Exception thrown = assertThrows(SQLException.class, () -> dao.addCourse(1000L, 123L));
+        assertEquals("Student or Course doesn't exist", thrown.getMessage());
+    }
+
+    @Test
+    void shouldDeleteCourse() {
+        assertDoesNotThrow(() -> dao.deleteCourse(1000L, 1000L));
+    }
+
+    @Test
+    void shouldNotDeleteCourse() {
+        Exception thrown = assertThrows(IllegalArgumentException.class, () -> dao.deleteCourse(1000L, 123L));
+        assertEquals("Course with id=123 was not added before", thrown.getMessage());
+    }
 }

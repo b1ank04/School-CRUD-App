@@ -51,7 +51,7 @@ public class JDBCCourseDao extends AbstractCrudDao<Course, Long> implements Cour
 
     @Override
     protected Course update(Course entity) throws SQLException {
-        int update = jdbcTemplate.update(UPDATE, entity.getName(), entity.getDescription());
+        int update = jdbcTemplate.update(UPDATE, entity.getName(), entity.getDescription(), entity.getId());
         if (update != 1) throw new SQLException("Course doesn't exist");
         return entity;
     }
