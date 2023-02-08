@@ -1,6 +1,7 @@
 package com.foxminded.school.menu;
 
 import com.foxminded.school.dao.jdbc.JDBCStudentDao;
+import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.slf4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,7 +26,10 @@ public class StudentMenu {
                     save
                     find
                     findAll
-                    delete""");
+                    delete
+                    findRelatedCourses
+                    addCourse
+                    deleteCourse""");
             String method = sc.next();
             switch(method) {
                 case ("save") -> {
@@ -64,6 +68,29 @@ public class StudentMenu {
                     Optional<Student> student = jdbcStudentDao.findById(id);
                     jdbcStudentDao.deleteById(id);
                     logger.info("{} -deleted",student);
+                }
+                case ("findRelatedCourses") -> {
+                    logger.info("ID:");
+                    Long id = sc.nextLong();
+                    for (Course c : jdbcStudentDao.findRelatedCourses(id)) {
+                        logger.info("{}", c);
+                    }
+                }
+                case ("addCourse") -> {
+                    logger.info("Student ID:");
+                    Long studentId = sc.nextLong();
+                    logger.info("Course ID:");
+                    Long courseId = sc.nextLong();
+                    jdbcStudentDao.addCourse(studentId, courseId);
+                    logger.info("Successfully added");
+                }
+                case ("deleteCourse") -> {
+                    logger.info("Student ID:");
+                    Long studentId = sc.nextLong();
+                    logger.info("Course ID:");
+                    Long courseId = sc.nextLong();
+                    jdbcStudentDao.deleteCourse(studentId, courseId);
+                    logger.info("Successfully deleted");
                 }
                 default -> logger.error("Wrong method");
             }
