@@ -1,6 +1,5 @@
-package com.foxminded.school.dao.modeldao;
+package com.foxminded.school.dao;
 
-import com.foxminded.school.dao.CrudDao;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 

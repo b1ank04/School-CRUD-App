@@ -1,7 +1,7 @@
 package com.foxminded.school.dao.jdbc;
 
 import com.foxminded.school.dao.AbstractCrudDao;
-import com.foxminded.school.dao.modeldao.StudentDao;
+import com.foxminded.school.dao.StudentDao;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.course.CourseMapper;
 import com.foxminded.school.model.student.Student;

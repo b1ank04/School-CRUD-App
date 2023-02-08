@@ -1,6 +1,6 @@
 package com.foxminded.school.dao.jdbc;
 
-import com.foxminded.school.dao.modeldao.CourseDao;
+import com.foxminded.school.dao.CourseDao;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.junit.jupiter.api.BeforeEach;

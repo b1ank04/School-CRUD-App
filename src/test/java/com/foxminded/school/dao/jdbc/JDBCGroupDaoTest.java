@@ -1,6 +1,6 @@
 package com.foxminded.school.dao.jdbc;
 
-import com.foxminded.school.dao.modeldao.GroupDao;
+import com.foxminded.school.dao.GroupDao;
 import com.foxminded.school.model.group.Group;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

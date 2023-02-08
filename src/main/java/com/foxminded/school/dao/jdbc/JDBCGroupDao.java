@@ -1,7 +1,7 @@
 package com.foxminded.school.dao.jdbc;
 
 import com.foxminded.school.dao.AbstractCrudDao;
-import com.foxminded.school.dao.modeldao.GroupDao;
+import com.foxminded.school.dao.GroupDao;
 import com.foxminded.school.model.group.Group;
 import com.foxminded.school.model.group.GroupMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
