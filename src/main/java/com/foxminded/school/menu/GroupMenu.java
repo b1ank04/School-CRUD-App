@@ -1,9 +1,8 @@
 package com.foxminded.school.menu;
 
-import com.foxminded.school.dao.jdbc.JDBCGroupDao;
 import com.foxminded.school.model.group.Group;
+import com.foxminded.school.service.GroupService;
 import org.slf4j.Logger;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -16,8 +15,7 @@ public class GroupMenu {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void run(JdbcTemplate jdbcTemplate, Logger logger) throws SQLException {
-        JDBCGroupDao jdbcGroupDao = new JDBCGroupDao(jdbcTemplate);
+    public static void run(GroupService groupService, Logger logger) throws SQLException {
         try (Scanner sc = new Scanner(System.in)) {
             logger.info("""
                                         
@@ -34,12 +32,12 @@ public class GroupMenu {
                     logger.info("Name:");
                     String name = sc.next();
                     Group course = new Group(id == 0 ? null : id, name);
-                    logger.info("{} -saved", jdbcGroupDao.save(course));
+                    logger.info("{} -saved", groupService.save(course));
                 }
                 case ("find") -> {
                     logger.info("ID:");
                     Long id = sc.nextLong();
-                    Optional<Group> group = jdbcGroupDao.findById(id);
+                    Optional<Group> group = groupService.findById(id);
                     if (group.isPresent()) {
                         logger.info("{}",group.get());
                     }
@@ -48,7 +46,7 @@ public class GroupMenu {
                     }
                 }
                 case ("findAll") -> {
-                    List<Group> groups = jdbcGroupDao.findAll();
+                    List<Group> groups = groupService.findAll();
                     for (Group g : groups) {
                         logger.info("{}", g);
                     }
@@ -56,8 +54,8 @@ public class GroupMenu {
                 case ("delete") -> {
                     logger.info("ID:");
                     Long id = sc.nextLong();
-                    Optional<Group> group = jdbcGroupDao.findById(id);
-                    jdbcGroupDao.deleteById(id);
+                    Optional<Group> group = groupService.findById(id);
+                    groupService.deleteById(id);
                     logger.info("{} -deleted",group);
                 }
                 default -> logger.error("Wrong method");

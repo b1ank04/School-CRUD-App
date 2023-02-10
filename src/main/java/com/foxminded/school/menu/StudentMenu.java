@@ -1,10 +1,9 @@
 package com.foxminded.school.menu;
 
-import com.foxminded.school.dao.jdbc.JDBCStudentDao;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
+import com.foxminded.school.service.StudentService;
 import org.slf4j.Logger;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -16,8 +15,9 @@ public class StudentMenu {
     private StudentMenu() {
         throw new IllegalStateException("Utility class");
     }
-    public static void run(JdbcTemplate jdbcTemplate, Logger logger) throws SQLException {
-        JDBCStudentDao jdbcStudentDao = new JDBCStudentDao(jdbcTemplate);
+
+    public static void run(StudentService studentService, Logger logger) throws SQLException {
+
 
         try (Scanner sc = new Scanner(System.in)) {
             logger.info("""
@@ -42,13 +42,13 @@ public class StudentMenu {
                     logger.info("Last name:");
                     String lastName = sc.next();
                     Student student = new Student(id == 0? null:id, groupId == 0? null:groupId, firstName, lastName);
-                    Student result = jdbcStudentDao.save(student);
+                    Student result = studentService.save(student);
                     logger.info("{} -saved",result);
                 }
                 case ("find") -> {
                     logger.info("ID:");
                     Long id = sc.nextLong();
-                    Optional<Student> student = jdbcStudentDao.findById(id);
+                    Optional<Student> student = studentService.findById(id);
                     if (student.isPresent()) {
                         logger.info("{}",student.get());
                     }
@@ -57,7 +57,7 @@ public class StudentMenu {
                     }
                 }
                 case ("findAll") -> {
-                    List<Student> students = jdbcStudentDao.findAll();
+                    List<Student> students = studentService.findAll();
                     for (Student s : students) {
                         logger.info("{}",s);
                     }
@@ -65,14 +65,14 @@ public class StudentMenu {
                 case ("delete") -> {
                     logger.info("ID:");
                     Long id = sc.nextLong();
-                    Optional<Student> student = jdbcStudentDao.findById(id);
-                    jdbcStudentDao.deleteById(id);
+                    Optional<Student> student = studentService.findById(id);
+                    studentService.deleteById(id);
                     logger.info("{} -deleted",student);
                 }
                 case ("findRelatedCourses") -> {
                     logger.info("ID:");
                     Long id = sc.nextLong();
-                    for (Course c : jdbcStudentDao.findRelatedCourses(id)) {
+                    for (Course c : studentService.findRelatedCourses(id)) {
                         logger.info("{}", c);
                     }
                 }
@@ -81,7 +81,7 @@ public class StudentMenu {
                     Long studentId = sc.nextLong();
                     logger.info("Course ID:");
                     Long courseId = sc.nextLong();
-                    jdbcStudentDao.addCourse(studentId, courseId);
+                    studentService.addCourse(studentId, courseId);
                     logger.info("Successfully added");
                 }
                 case ("deleteCourse") -> {
@@ -89,7 +89,7 @@ public class StudentMenu {
                     Long studentId = sc.nextLong();
                     logger.info("Course ID:");
                     Long courseId = sc.nextLong();
-                    jdbcStudentDao.deleteCourse(studentId, courseId);
+                    studentService.deleteCourse(studentId, courseId);
                     logger.info("Successfully deleted");
                 }
                 default -> logger.error("Wrong method");

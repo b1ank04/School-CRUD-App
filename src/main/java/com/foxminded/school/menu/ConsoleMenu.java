@@ -1,11 +1,13 @@
 package com.foxminded.school.menu;
 
+import com.foxminded.school.service.CourseService;
+import com.foxminded.school.service.GroupService;
+import com.foxminded.school.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
@@ -13,11 +15,15 @@ import java.util.Scanner;
 @Component
 @Profile("!test")
 public class ConsoleMenu implements ApplicationRunner {
-    private final JdbcTemplate jdbcTemplate;
+    private final StudentService studentService;
+    private final GroupService groupService;
+    private final CourseService courseService;
     private static final Logger LOG = LoggerFactory.getLogger(ConsoleMenu.class);
 
-    public ConsoleMenu(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ConsoleMenu(StudentService studentService, GroupService groupService, CourseService courseService) {
+        this.studentService = studentService;
+        this.groupService = groupService;
+        this.courseService = courseService;
     }
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -29,9 +35,9 @@ public class ConsoleMenu implements ApplicationRunner {
                     group""");
             String daoName = sc.nextLine();
             switch (daoName) {
-                case ("student") -> StudentMenu.run(jdbcTemplate, LOG);
-                case ("course") -> CourseMenu.run(jdbcTemplate, LOG);
-                case ("group") -> GroupMenu.run(jdbcTemplate, LOG);
+                case ("student") -> StudentMenu.run(studentService, LOG);
+                case ("course") -> CourseMenu.run(courseService, LOG);
+                case ("group") -> GroupMenu.run(groupService, LOG);
                 default -> LOG.error("Wrong dao");
             }
         }
