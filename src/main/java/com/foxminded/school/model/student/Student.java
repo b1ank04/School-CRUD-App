@@ -9,7 +9,11 @@ import lombok.*;
 @AllArgsConstructor
 public class Student implements HasId<Long> {
     private Long id;
-    private final Integer groupId;
+    private Integer groupId;
     private final String firstName;
     private final String lastName;
+
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
+    }
 }

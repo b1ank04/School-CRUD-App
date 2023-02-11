@@ -1,67 +1,69 @@
 package com.foxminded.school.menu;
 
-import com.foxminded.school.dao.jdbc.JDBCGroupDao;
 import com.foxminded.school.model.group.Group;
-import org.slf4j.Logger;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.foxminded.school.service.GroupService;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
-public class GroupMenu {
+@Component
+public class GroupMenu implements SubMenu {
 
-    private GroupMenu() {
-        throw new IllegalStateException("Utility class");
+    private final GroupService groupService;
+    private final Console console;
+
+    public GroupMenu(GroupService groupService, Console console) {
+        this.groupService = groupService;
+        this.console = console;
     }
 
-    public static void run(JdbcTemplate jdbcTemplate, Logger logger) throws SQLException {
-        JDBCGroupDao jdbcGroupDao = new JDBCGroupDao(jdbcTemplate);
-        try (Scanner sc = new Scanner(System.in)) {
-            logger.info("""
-                                        
-                    Please choose the method you want to use:
-                    save
-                    find
-                    findAll
-                    delete""");
-            String method = sc.next();
-            switch (method) {
-                case ("save") -> {
-                    logger.info("Group ID (type 0 to create new)");
-                    long id = sc.nextLong();
-                    logger.info("Name:");
-                    String name = sc.next();
-                    Group course = new Group(id == 0 ? null : id, name);
-                    logger.info("{} -saved", jdbcGroupDao.save(course));
-                }
-                case ("find") -> {
-                    logger.info("ID:");
-                    Long id = sc.nextLong();
-                    Optional<Group> group = jdbcGroupDao.findById(id);
-                    if (group.isPresent()) {
-                        logger.info("{}",group.get());
-                    }
-                    else {
-                        logger.error("Group doesn't exist");
-                    }
-                }
-                case ("findAll") -> {
-                    List<Group> groups = jdbcGroupDao.findAll();
-                    for (Group g : groups) {
-                        logger.info("{}", g);
-                    }
-                }
-                case ("delete") -> {
-                    logger.info("ID:");
-                    Long id = sc.nextLong();
-                    Optional<Group> group = jdbcGroupDao.findById(id);
-                    jdbcGroupDao.deleteById(id);
-                    logger.info("{} -deleted",group);
-                }
-                default -> logger.error("Wrong method");
+    public void run() throws SQLException {
+        console.println("""                    
+                Please choose the method you want to use:
+                save
+                find
+                findAll
+                delete""");
+        String method = console.readString();
+        switch (method) {
+            case ("save") -> {
+                console.println("Group ID (type 0 to create new)");
+                long id = Long.parseLong(console.readString());
+                console.println("Name:");
+                String name = console.readString();
+                Group course = new Group(id == 0 ? null : id, name);
+                console.println(groupService.save(course).toString());
             }
+            case ("find") -> {
+                console.println("ID:");
+                Long id = Long.parseLong(console.readString());
+                Optional<Group> group = groupService.findById(id);
+                if (group.isPresent()) {
+                    console.println(group.get().toString());
+                }
+                else {
+                    console.println("Group doesn't exist");
+                }
+            }
+            case ("findAll") -> {
+                List<Group> groups = groupService.findAll();
+                for (Group g : groups) {
+                    console.println(g.toString());
+                }
+            }
+            case ("delete") -> {
+                console.println("ID:");
+                Long id = Long.parseLong(console.readString());
+                Optional<Group> group = groupService.findById(id);
+                groupService.deleteById(id);
+                console.println(group.toString());
+            }
+            default -> console.println("Wrong method");
         }
+    }
+    public String getTitle() {
+        return "group";
     }
 }

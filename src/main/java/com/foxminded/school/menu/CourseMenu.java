@@ -1,69 +1,81 @@
 package com.foxminded.school.menu;
 
-import com.foxminded.school.dao.jdbc.JDBCCourseDao;
 import com.foxminded.school.model.course.Course;
-import org.slf4j.Logger;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.foxminded.school.model.student.Student;
+import com.foxminded.school.service.CourseService;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
-public class CourseMenu {
+@Component
+public class CourseMenu implements SubMenu {
 
-    private CourseMenu() {
-        throw new IllegalStateException("Utility class");
+    private final Console console;
+    private final CourseService courseService;
+
+    public CourseMenu(Console console, CourseService courseService) {
+        this.console = console;
+        this.courseService = courseService;
     }
 
-    public static void run(JdbcTemplate jdbcTemplate, Logger logger) throws SQLException {
-        JDBCCourseDao jdbcCourseDao = new JDBCCourseDao(jdbcTemplate);
-        try (Scanner sc = new Scanner(System.in)) {
-            logger.info("""
-                                        
-                    Please choose the method you want to use:
-                    save
-                    find
-                    findAll
-                    delete""");
-            String method = sc.next();
-            switch (method) {
-                case ("save") -> {
-                    logger.info("Course ID (type 0 to create new)");
-                    long id = sc.nextLong();
-                    logger.info("Name:");
-                    String name = sc.next();
-                    logger.info("Description: ");
-                    String description = sc.next();
-                    Course course = new Course(id == 0 ? null : id, name, description.equals("") ? null : description);
-                    logger.info("{} -saved", jdbcCourseDao.save(course));
-                }
-                case ("find") -> {
-                    logger.info("ID:");
-                    Long id = sc.nextLong();
-                    Optional<Course> course = jdbcCourseDao.findById(id);
-                    if (course.isPresent()) {
-                        logger.info("{}",course.get());
-                    }
-                    else {
-                        logger.error("Course doesn't exist");
-                    }
-                }
-                case ("findAll") -> {
-                    List<Course> courses = jdbcCourseDao.findAll();
-                    for (Course c : courses) {
-                        logger.info("{}",c);
-                    }
-                }
-                case ("delete") -> {
-                    logger.info("ID:");
-                    Long id = sc.nextLong();
-                    Optional<Course> course = jdbcCourseDao.findById(id);
-                    jdbcCourseDao.deleteById(id);
-                    logger.info("{} -deleted",course);
-                }
-                default -> logger.error("Wrong method");
+    public void run() throws SQLException {
+        console.println("""                    
+                Please choose the method you want to use:
+                save
+                find
+                findAll
+                delete
+                findRelatedStudents""");
+        String method = console.readString();
+        switch (method) {
+            case ("save") -> {
+                console.println("Course ID (type 0 to create new)");
+                long id = Long.parseLong(console.readString());
+                console.println("Name:");
+                String name = console.readString();
+                console.println("Description: ");
+                String description = console.readString();
+                Course course = new Course(id == 0 ? null : id, name, description.equals("") ? null : description);
+                console.println(courseService.save(course).toString());
             }
+            case ("find") -> {
+                console.println("ID:");
+                Long id = Long.parseLong(console.readString());
+                Optional<Course> course = courseService.findById(id);
+                if (course.isPresent()) {
+                    console.println(course.get().toString());
+                }
+                else {
+                    console.println("Course doesn't exist");
+                }
+            }
+            case ("findAll") -> {
+                List<Course> courses = courseService.findAll();
+                for (Course c : courses) {
+                    console.println(c.toString());
+                }
+            }
+            case ("delete") -> {
+                console.println("ID:");
+                Long id = Long.parseLong(console.readString());
+                Optional<Course> course = courseService.findById(id);
+                courseService.deleteById(id);
+                console.println(course.toString());
+            }
+            case ("findRelatedStudents") -> {
+                console.println("ID:");
+                Long id = Long.parseLong(console.readString());
+                for (Student student : courseService.findRelatedStudents(id)) {
+                    console.println(student.toString());
+                }
+            }
+            default -> console.println("Wrong method");
         }
+    }
+
+    public String getTitle() {
+        return "course";
     }
 }

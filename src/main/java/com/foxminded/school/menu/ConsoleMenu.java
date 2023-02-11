@@ -1,39 +1,37 @@
 package com.foxminded.school.menu;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Scanner;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @Profile("!test")
 public class ConsoleMenu implements ApplicationRunner {
-    private final JdbcTemplate jdbcTemplate;
-    private static final Logger LOG = LoggerFactory.getLogger(ConsoleMenu.class);
 
-    public ConsoleMenu(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private final Console console;
+    private final List<SubMenu> subMenus;
+
+    public ConsoleMenu(Console console, List<SubMenu> subMenus) {
+        this.console = console;
+        this.subMenus = subMenus;
     }
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        try (Scanner sc = new Scanner(System.in)) {
-            LOG.info("""
-                    Choose dao:
-                    student
-                    course
-                    group""");
-            String daoName = sc.nextLine();
-            switch (daoName) {
-                case ("student") -> StudentMenu.run(jdbcTemplate, LOG);
-                case ("course") -> CourseMenu.run(jdbcTemplate, LOG);
-                case ("group") -> GroupMenu.run(jdbcTemplate, LOG);
-                default -> LOG.error("Wrong dao");
-            }
+        while (true) {
+            console.println("Choose dao:");
+            subMenus.forEach(menu -> console.println(menu.getTitle()));
+            console.println("exit (to leave)");
+            String daoName = console.readString();
+            if (daoName.equals("exit")) return;
+            Optional<SubMenu> menu = subMenus.stream().filter(it -> it.getTitle().equals(daoName)).findFirst();
+            if (menu.isPresent()) menu.get().run();
+            else console.println("Wrong dao");
         }
     }
 }
+
