@@ -1,7 +1,10 @@
 package com.foxminded.school.menu;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Scanner;
 
+@Component
 class DefaultConsole implements Console {
     private final Scanner scanner = new Scanner(System.in);
 

@@ -2,19 +2,24 @@ package com.foxminded.school.menu;
 
 import com.foxminded.school.model.group.Group;
 import com.foxminded.school.service.GroupService;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class GroupMenu {
+@Component
+public class GroupMenu implements SubMenu {
 
-    private GroupMenu() {
-        throw new IllegalStateException("Utility class");
+    private final GroupService groupService;
+    private final Console console;
+
+    public GroupMenu(GroupService groupService, Console console) {
+        this.groupService = groupService;
+        this.console = console;
     }
 
-    public static void run(GroupService groupService) throws SQLException {
-        DefaultConsole console = new DefaultConsole();
+    public void run() throws SQLException {
         console.println("""                    
                 Please choose the method you want to use:
                 save
@@ -57,5 +62,8 @@ public class GroupMenu {
             }
             default -> console.println("Wrong method");
         }
+    }
+    public String getTitle() {
+        return "group";
     }
 }

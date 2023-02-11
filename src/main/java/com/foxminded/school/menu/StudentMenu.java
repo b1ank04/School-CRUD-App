@@ -3,19 +3,24 @@ package com.foxminded.school.menu;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import com.foxminded.school.service.StudentService;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class StudentMenu {
+@Component
+public class StudentMenu implements SubMenu {
 
-    private StudentMenu() {
-        throw new IllegalStateException("Utility class");
+    private final StudentService studentService;
+    private final DefaultConsole console;
+
+    public StudentMenu(StudentService studentService, DefaultConsole console) {
+        this.studentService = studentService;
+        this.console = console;
     }
 
-    public static void run(StudentService studentService) throws SQLException {
-        DefaultConsole console = new DefaultConsole();
+    public void run() throws SQLException {
         console.println("""
                 Please choose the method you want to use:
                 save
@@ -89,6 +94,8 @@ public class StudentMenu {
             }
             default -> console.println("Wrong method");
         }
-
+    }
+    public String getTitle() {
+        return "student";
     }
 }

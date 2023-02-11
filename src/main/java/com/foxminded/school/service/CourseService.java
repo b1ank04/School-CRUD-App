@@ -5,6 +5,7 @@ import com.foxminded.school.dao.jdbc.JDBCCourseDao;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -19,22 +20,27 @@ public class CourseService implements CourseDao {
         this.jdbcCourseDao = jdbcCourseDao;
     }
 
+    @Transactional
     public Course save(Course course) throws SQLException {
         return jdbcCourseDao.save(course);
     }
 
+    @Transactional(readOnly = true)
     public Optional<Course> findById(Long id) {
         return jdbcCourseDao.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<Course> findAll() {
         return jdbcCourseDao.findAll();
     }
 
+    @Transactional
     public void deleteById(Long id) throws SQLException {
         jdbcCourseDao.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<Student> findRelatedStudents(Long id) {
         return jdbcCourseDao.findRelatedStudents(id);
     }
