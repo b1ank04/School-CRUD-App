@@ -19,7 +19,7 @@ public class JPACourseDao extends AbstractCrudDao<Course, Long> implements Cours
     private EntityManager em;
 
     @Override
-    protected Course create(Course entity){
+    protected Course create(Course entity) {
         em.persist(entity);
         return entity;
     }
@@ -30,7 +30,7 @@ public class JPACourseDao extends AbstractCrudDao<Course, Long> implements Cours
     }
 
     @Override
-    public Optional<Course> findById(Long id){
+    public Optional<Course> findById(Long id) {
         return Optional.ofNullable(em.find(Course.class, id));
     }
 
@@ -42,7 +42,11 @@ public class JPACourseDao extends AbstractCrudDao<Course, Long> implements Cours
     @Override
     public void deleteById(Long id) throws SQLException {
         Optional<Course> entity = findById(id);
-        entity.ifPresentOrElse(course -> em.remove(course), () -> System.out.println("Course doesn't exist"));
+        if (entity.isPresent()) {
+            em.remove(entity.get());
+        } else {
+            throw new SQLException("Course with id=" + id + " does not exists");
+        }
     }
 
     @Override
@@ -54,10 +58,10 @@ public class JPACourseDao extends AbstractCrudDao<Course, Long> implements Cours
 
          */
         return em.createNativeQuery("""
-                                                SELECT * FROM students
-                                                INNER JOIN student_course
-                                                ON students.id = student_course.student_id
-                                                where student_course.course_id = ?
-""").getResultList();
+                                                                SELECT * FROM students
+                                                                INNER JOIN student_course
+                                                                ON students.id = student_course.student_id
+                                                                where student_course.course_id = ?
+                """).getResultList();
     }
 }

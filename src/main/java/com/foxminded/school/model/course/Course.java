@@ -11,6 +11,7 @@ import java.util.Set;
 @Table(name = "courses")
 @RequiredArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Course implements HasId<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,10 @@ public class Course implements HasId<Long> {
     private String description;
 
     @ToString.Exclude
-    @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     @Getter
     @Setter
+    @EqualsAndHashCode.Exclude
     private Set<Student> students = new HashSet<>();
 
     public Course(Long id, String name, String description) {

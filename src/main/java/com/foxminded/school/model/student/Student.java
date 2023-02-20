@@ -58,4 +58,11 @@ public class Student implements HasId<Long> {
         this.lastName = lastName;
         this.courses = courses;
     }
+
+    public void removeCourse(Course course) {
+        if (getCourses().contains(course)) {
+            course.getStudents().remove(this);
+            getCourses().remove(course);
+        }
+    }
 }
