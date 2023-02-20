@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS groups(
 );
 
 CREATE TABLE IF NOT EXISTS students(
-                                       id SERIAL PRIMARY KEY not null,
+                                       id SERIAL PRIMARY KEY,
                                        group_id INT,
                                        first_name VARCHAR(20),
                                        last_name VARCHAR(20),
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS students(
 );
 
 CREATE TABLE IF NOT EXISTS courses(
-                                      id SERIAL PRIMARY KEY not null,
+                                      id SERIAL PRIMARY KEY,
                                       name VARCHAR(20),
                                       description VARCHAR(40)
 );

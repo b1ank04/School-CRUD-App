@@ -25,7 +25,8 @@ public class DataGenerator {
         while (students.size() < 200) {
             String firstName = firstNames.get(random.nextInt(firstNames.size()));
             String lastName = lastNames.get(random.nextInt(lastNames.size()));
-            students.add(new Student(null,null, firstName, lastName));
+            Student student = new Student(null, null, firstName, lastName);
+            students.add(student);
         }
 
         return assignStudents(students.stream().toList());
@@ -59,7 +60,9 @@ public class DataGenerator {
         Collections.shuffle(courses);
         Set<Course> myCourses = new HashSet<>();
         for (String name : courses) {
-            myCourses.add(new Course(null, name, null));
+            Course course = new Course();
+            course.setName(name);
+            myCourses.add(course);
         }
         return myCourses;
     }

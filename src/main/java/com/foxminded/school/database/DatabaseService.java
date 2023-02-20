@@ -2,8 +2,6 @@ package com.foxminded.school.database;
 
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class DatabaseService implements ApplicationRunner {
+public class DatabaseService {
 
     private final JdbcTemplate jdbcTemplate;
     private static final String INSERT_GROUPS = "INSERT INTO groups (name) values (?)";
@@ -23,14 +21,14 @@ public class DatabaseService implements ApplicationRunner {
     public DatabaseService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-    @Override
-    public void run(ApplicationArguments args) {
+
+    public void execute() {
         Integer studentsFlag = jdbcTemplate.queryForList("SELECT count(id) FROM students", Integer.class).get(0);
         Integer groupsFlag = jdbcTemplate.queryForList("SELECT count(id) FROM groups", Integer.class).get(0);
         Integer coursesFlag = jdbcTemplate.queryForList("SELECT count(id) from courses", Integer.class).get(0);
         Integer studentCourseFlag = jdbcTemplate.queryForList("SELECT count(student_id) from student_course", Integer.class).get(0);
-        if (studentsFlag < 1) fillStudents(DataGenerator.createStudents().stream().toList());
         if (groupsFlag < 1) fillGroups(DataGenerator.createGroups().stream().toList());
+        if (studentsFlag < 1) fillStudents(DataGenerator.createStudents().stream().toList());
         if (coursesFlag < 1) fillCourses(DataGenerator.createCourses().stream().toList());
         if (studentCourseFlag < 1) fillStudCourse(DataGenerator.assignStudentsToCourses());
     }
