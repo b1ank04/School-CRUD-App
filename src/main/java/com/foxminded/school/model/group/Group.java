@@ -1,13 +1,22 @@
 package com.foxminded.school.model.group;
 
 import com.foxminded.school.model.HasId;
+import jakarta.persistence.*;
 import lombok.*;
 
+
+@Entity
+@Table(name = "groups")
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Data
 @ToString
 @EqualsAndHashCode
-@AllArgsConstructor
 public class Group implements HasId<Long> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name")
     private String name;
 }

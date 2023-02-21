@@ -26,7 +26,10 @@ public class JPACourseDao extends AbstractCrudDao<Course, Long> implements Cours
 
     @Override
     protected Course update(Course entity) throws SQLException {
-        return em.merge(entity);
+        Optional<Course> course = findById(entity.getId());
+        if (course.isPresent()) {
+            return em.merge(entity);
+        } else throw new SQLException(String.format("Course with id=%d doesn't exist", entity.getId()));
     }
 
     @Override
@@ -44,24 +47,14 @@ public class JPACourseDao extends AbstractCrudDao<Course, Long> implements Cours
         Optional<Course> entity = findById(id);
         if (entity.isPresent()) {
             em.remove(entity.get());
-        } else {
-            throw new SQLException("Course with id=" + id + " does not exists");
-        }
+        } else throw new SQLException("Course with id="+ id + " doesn't exist");
     }
 
     @Override
-    public List<Student> findRelatedStudents(Long id) {
-        /*return em.createQuery("""
-                SELECT s FROM Student s
-                JOIN s.courses c
-                WHERE c.id = :courseId""", Student.class).getResultList();
-
-         */
-        return em.createNativeQuery("""
-                                                                SELECT * FROM students
-                                                                INNER JOIN student_course
-                                                                ON students.id = student_course.student_id
-                                                                where student_course.course_id = ?
-                """).getResultList();
+    public List<Student> findRelatedStudents(Long id) throws SQLException {
+        Optional<Course> entity = findById(id);
+        if (entity.isPresent()) {
+            return entity.get().getStudents().stream().toList();
+        } else throw new SQLException("Student with id="+ id + " doesn't exist");
     }
 }

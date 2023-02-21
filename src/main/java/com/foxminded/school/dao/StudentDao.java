@@ -9,5 +9,5 @@ import java.util.List;
 public interface StudentDao extends CrudDao<Student, Long> {
     List<Course> findRelatedCourses(Long id);
     void addCourse(Long studentId, Long courseId) throws SQLException;
-    void deleteCourse(Long studentId, Long courseId);
+    void removeCourse(Long studentId, Long courseId) throws SQLException;
 }

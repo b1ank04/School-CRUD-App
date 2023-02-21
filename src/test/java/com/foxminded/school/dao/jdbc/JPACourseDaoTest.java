@@ -2,7 +2,6 @@ package com.foxminded.school.dao.jdbc;
 
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,91 +26,75 @@ import static org.junit.jupiter.api.Assertions.*;
 class JPACourseDaoTest {
 
     @Autowired
-    private JPACourseDao courseDao;
+    private JPACourseDao dao;
 
     @Autowired
     private JPAStudentDao studentDao;
 
-    @Autowired
-    private EntityManager em;
-
     @Test
-    void shouldFindById() throws SQLException {
+    void shouldFindById() {
         Course course = new Course(1000L, "test", null);
-        assertEquals(Optional.of(course), courseDao.findById(1000L));
+        assertEquals(Optional.of(course), dao.findById(1000L));
     }
 
     @Test
-    void shouldNotFindById() throws SQLException {
-        assertEquals(Optional.empty(), courseDao.findById(999L));
+    void shouldNotFindById() {
+        assertEquals(Optional.empty(), dao.findById(999L));
     }
 
     @Test
-    void shouldFindAll() throws SQLException {
+    void shouldFindAll() {
         assertEquals(List.of(new Course(1000L, "test", null),
                 new Course(1001L, "test1", null),
-                new Course(500L, "test2", null)), courseDao.findAll());
+                new Course(500L, "test2", null)), dao.findAll());
     }
 
     @Test
     void shouldNotFindAll() throws SQLException {
-        courseDao.deleteById(1000L);
-        courseDao.deleteById(1001L);
-        courseDao.deleteById(500L);
-        assertEquals(new ArrayList<>(), courseDao.findAll());
+        dao.deleteById(1000L);
+        dao.deleteById(1001L);
+        dao.deleteById(500L);
+        assertEquals(new ArrayList<>(), dao.findAll());
     }
 
     @Test
     void shouldDeleteById() throws SQLException {
-        courseDao.deleteById(1000L);
-        assertEquals(Optional.empty(), courseDao.findById(1000L));
+        dao.deleteById(1000L);
+        assertEquals(Optional.empty(), dao.findById(1000L));
     }
 
     @Test
     void shouldNotDeleteById() {
-        Exception thrown = assertThrows(SQLException.class, () -> courseDao.deleteById(123L));
-        assertEquals("Course with id=123 does not exists", thrown.getMessage());
+        Exception thrown = assertThrows(SQLException.class, () -> dao.deleteById(123L));
+        assertEquals("Course with id=123 doesn't exist", thrown.getMessage());
     }
 
     @Test
     void shouldCreate() throws SQLException {
         Course course = new Course(1L, "create", null);
-        assertEquals(course, courseDao.save(new Course(null, "create", null)));
+        assertEquals(course, dao.save(new Course(null, "create", null)));
     }
 
     @Test
     void shouldUpdate() {
-        assertDoesNotThrow(() -> courseDao.save(new Course(1000L, "TEST1", null)));
+        assertDoesNotThrow(() -> dao.save(new Course(1000L, "TEST1", null)));
     }
 
     @Test
     void shouldNotUpdate() {
-        // see should not delete
-        Exception thrown = assertThrows(SQLException.class, () -> courseDao.save(new Course(123L, "fail", null)));
-        assertEquals("Course doesn't exist", thrown.getMessage());
+        Exception thrown = assertThrows(SQLException.class, () -> dao.save(new Course(123L, "fail", null)));
+        assertEquals("Course with id=123 doesn't exist", thrown.getMessage());
     }
 
     @Test
-    void shouldFindRelatedStudents() {
-        Set<Student> students = Set.of(new Student(1000L, 1000, "max", "payne"));
-        assertEquals(students, courseDao.findById(1000L).get().getStudents());
+    void shouldFindRelatedStudents() throws SQLException {
+        List<Student> students = List.of(new Student(1000L, 1000, "max", "payne"));
+        assertEquals(students, dao.findRelatedStudents(1000L));
     }
 
     @Test
     void shouldNotFindRelatedStudents() throws SQLException {
-        Course course = courseDao.findById(1000L).get();
-        Student student = course.getStudents().stream().findFirst().get();
-        student.removeCourse(course); // you can do the same with course
-        courseDao.save(course);
-
-        flushAndClear(); // as you do all in single transaction, you need to cheat
-
-        Course course1 = courseDao.findById(1000L).get();
-        assertFalse(course1.getStudents().contains(student));
-    }
-
-    private void flushAndClear() {
-        em.flush();
-        em.clear();
+        studentDao.removeCourse(1000L, 1000L);
+        assertEquals(new ArrayList<>(), dao.findRelatedStudents(1000L));
     }
 }

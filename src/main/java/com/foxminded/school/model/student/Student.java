@@ -5,6 +5,7 @@ import com.foxminded.school.model.course.Course;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 @EqualsAndHashCode
 public class Student implements HasId<Long> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
     private Long id;
@@ -59,10 +60,17 @@ public class Student implements HasId<Long> {
         this.courses = courses;
     }
 
-    public void removeCourse(Course course) {
+    public void addCourse(Course course) throws SQLException {
+        if (!getCourses().contains(course)) {
+            course.getStudents().add(this);
+            getCourses().add(course);
+        } else throw new SQLException("Course with id="+ course.getId() + " was added before");
+    }
+
+    public void removeCourse(Course course) throws SQLException {
         if (getCourses().contains(course)) {
             course.getStudents().remove(this);
             getCourses().remove(course);
-        }
+        } else throw new SQLException("Course with id =" + course.getId() + " wasn't added before");
     }
 }

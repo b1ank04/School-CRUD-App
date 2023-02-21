@@ -41,7 +41,7 @@ public class CourseService implements CourseDao {
     }
 
     @Transactional(readOnly = true)
-    public List<Student> findRelatedStudents(Long id) {
+    public List<Student> findRelatedStudents(Long id) throws SQLException {
         return jpaCourseDao.findRelatedStudents(id);
     }
 }

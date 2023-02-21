@@ -51,7 +51,7 @@ public class StudentService implements StudentDao {
     }
 
     @Transactional
-    public void deleteCourse(Long studentId, Long courseId) {
-        jpaStudentDao.deleteCourse(studentId, courseId);
+    public void removeCourse(Long studentId, Long courseId) throws SQLException {
+        jpaStudentDao.removeCourse(studentId, courseId);
     }
 }

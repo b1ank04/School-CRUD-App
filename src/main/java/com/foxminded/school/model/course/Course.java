@@ -10,8 +10,8 @@ import java.util.Set;
 @Entity
 @Table(name = "courses")
 @RequiredArgsConstructor
-@ToString
 @EqualsAndHashCode
+@ToString
 public class Course implements HasId<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +28,10 @@ public class Course implements HasId<Long> {
     private String description;
 
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     @Getter
     @Setter
-    @EqualsAndHashCode.Exclude
     private Set<Student> students = new HashSet<>();
 
     public Course(Long id, String name, String description) {

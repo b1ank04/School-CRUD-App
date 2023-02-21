@@ -27,13 +27,15 @@ public class JPAStudentDao extends AbstractCrudDao<Student, Long> implements Stu
 
     @Override
     protected Student update(Student entity) throws SQLException {
-        return em.merge(entity);
+        Optional<Student> student = findById(entity.getId());
+        if (student.isPresent()) {
+            return em.merge(entity);
+        } else throw new SQLException("Student with id="+ entity.getId() + " doesn't exist");
     }
 
     @Override
     public Optional<Student> findById(Long id) {
-        Student student = em.find(Student.class, id);
-        return Optional.ofNullable(student);
+        return Optional.ofNullable(em.find(Student.class, id));
     }
 
     @Override
@@ -44,42 +46,34 @@ public class JPAStudentDao extends AbstractCrudDao<Student, Long> implements Stu
     @Override
     public void deleteById(Long id) throws SQLException {
         Optional<Student> entity = findById(id);
-        entity.ifPresentOrElse(student -> em.remove(student), () -> System.out.println("Student doesn't exist"));
+        if (entity.isPresent()) {
+            em.remove(entity.get());
+        } else throw new SQLException("Student with id="+ id + " doesn't exist");
     }
 
     @Override
     public List<Course> findRelatedCourses(Long id) {
         Optional<Student> student = findById(id);
         if (student.isPresent()) {
-            return em.createQuery("""
-                                    SELECT c FROM Course c
-                                    JOIN c.students s
-                                    WHERE s.id = :studentId
-                                    """, Course.class)
-                    .setParameter("studentId", id)
-                    .getResultList();
-        }
-        else throw new IllegalArgumentException("Student doesn't exist");
+            return student.get().getCourses().stream().toList();
+        } else throw new IllegalArgumentException("Student doesn't exist");
     }
 
      @Override
     public void addCourse(Long studentId, Long courseId) throws SQLException {
-        /*List<Long> idList = findRelatedCourses(studentId).stream().map(Course::getId).toList();
-        if (idList.contains(courseId)) throw new IllegalArgumentException(String.format("Course with id=%s was added before", courseId));
-        try {
-            jdbcTemplate.update(ADD_COURSE, studentId, courseId);
-        } catch (Exception ignored) {
-            throw new SQLException("Student or Course doesn't exist");
-        }
-
-         */
+        Optional<Student> student = findById(studentId);
+        Optional<Course> course = Optional.ofNullable(em.find(Course.class, courseId));
+        if (student.isPresent() && course.isPresent()) {
+            student.get().addCourse(course.get());
+        } else throw new SQLException("Student or Course with given IDs don't exist");
     }
 
     @Override
-    public void deleteCourse(Long studentId, Long courseId) {
-       /* List<Long> idList = findRelatedCourses(studentId).stream().map(Course::getId).toList();
-        if (!idList.contains(courseId)) throw new IllegalArgumentException(String.format("Course with id=%s was not added before", courseId));
-        jdbcTemplate.update(DELETE_COURSE, studentId, courseId);
-        */
+    public void removeCourse(Long studentId, Long courseId) throws SQLException {
+        Optional<Student> student = findById(studentId);
+        Optional<Course> course = Optional.ofNullable(em.find(Course.class, courseId));
+        if (student.isPresent() && course.isPresent()) {
+            student.get().removeCourse(course.get());
+        } else throw new SQLException("Student or Course with given IDs doesn't exist");
     }
 }
