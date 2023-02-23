@@ -1,7 +1,6 @@
 package com.foxminded.school.service;
 
-import com.foxminded.school.dao.CourseDao;
-import com.foxminded.school.dao.jdbc.JPACourseDao;
+import com.foxminded.school.repository.jpa.JPACourseRepository;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.springframework.stereotype.Service;
@@ -12,36 +11,36 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CourseService implements CourseDao {
+public class CourseService{
 
-    private final JPACourseDao jpaCourseDao;
+    private final JPACourseRepository jpaCourseRepository;
 
-    public CourseService(JPACourseDao jpaCourseDao) {
-        this.jpaCourseDao = jpaCourseDao;
+    public CourseService(JPACourseRepository jpaCourseRepository) {
+        this.jpaCourseRepository = jpaCourseRepository;
     }
 
     @Transactional
     public Course save(Course course) throws SQLException {
-        return jpaCourseDao.save(course);
+        return jpaCourseRepository.save(course);
     }
 
     @Transactional(readOnly = true)
     public Optional<Course> findById(Long id) {
-        return jpaCourseDao.findById(id);
+        return jpaCourseRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
     public List<Course> findAll() {
-        return jpaCourseDao.findAll();
+        return jpaCourseRepository.findAll();
     }
 
     @Transactional
     public void deleteById(Long id) throws SQLException {
-        jpaCourseDao.deleteById(id);
+        jpaCourseRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
     public List<Student> findRelatedStudents(Long id) throws SQLException {
-        return jpaCourseDao.findRelatedStudents(id);
+        return jpaCourseRepository.findRelatedStudents(id);
     }
 }

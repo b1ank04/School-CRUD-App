@@ -1,6 +1,5 @@
 package com.foxminded.school.model.student;
 
-import com.foxminded.school.model.HasId;
 import com.foxminded.school.model.course.Course;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +13,7 @@ import java.util.Set;
 @Table(name = "students")
 @ToString
 @EqualsAndHashCode
-public class Student implements HasId<Long> {
+public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter

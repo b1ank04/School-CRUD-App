@@ -1,6 +1,5 @@
 package com.foxminded.school.model.group;
 
-import com.foxminded.school.model.HasId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +11,7 @@ import lombok.*;
 @Data
 @ToString
 @EqualsAndHashCode
-public class Group implements HasId<Long> {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

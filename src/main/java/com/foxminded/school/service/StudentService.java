@@ -1,7 +1,6 @@
 package com.foxminded.school.service;
 
-import com.foxminded.school.dao.StudentDao;
-import com.foxminded.school.dao.jdbc.JPAStudentDao;
+import com.foxminded.school.repository.jpa.JPAStudentRepository;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.springframework.stereotype.Service;
@@ -12,11 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class StudentService implements StudentDao {
+public class StudentService {
 
-    private final JPAStudentDao jpaStudentDao;
+    private final JPAStudentRepository jpaStudentDao;
 
-    public StudentService(JPAStudentDao jpaStudentDao) {
+    public StudentService(JPAStudentRepository jpaStudentDao) {
         this.jpaStudentDao = jpaStudentDao;
     }
 

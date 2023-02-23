@@ -1,11 +1,8 @@
-package com.foxminded.school.dao.jdbc;
+package com.foxminded.school.repository.jpa;
 
-import com.foxminded.school.dao.AbstractCrudDao;
-import com.foxminded.school.dao.CourseDao;
+import com.foxminded.school.repository.CourseRepository;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
@@ -13,44 +10,37 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class JPACourseDao extends AbstractCrudDao<Course, Long> implements CourseDao {
+public class JPACourseRepository {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final CourseRepository courseRepository;
 
-    @Override
-    protected Course create(Course entity) {
-        em.persist(entity);
-        return entity;
+    public JPACourseRepository(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
     }
 
-    @Override
-    protected Course update(Course entity) throws SQLException {
-        Optional<Course> course = findById(entity.getId());
-        if (course.isPresent()) {
-            return em.merge(entity);
+    public Course save(Course entity) throws SQLException {
+        if (entity.getId() == null) {
+            return courseRepository.save(entity);
+        } else if (courseRepository.findById(entity.getId()).isPresent()) {
+            return courseRepository.save(entity);
         } else throw new SQLException(String.format("Course with id=%d doesn't exist", entity.getId()));
     }
 
-    @Override
     public Optional<Course> findById(Long id) {
-        return Optional.ofNullable(em.find(Course.class, id));
+        return courseRepository.findById(id);
     }
 
-    @Override
     public List<Course> findAll() {
-        return em.createQuery("from Course", Course.class).getResultList();
+        return courseRepository.findAll();
     }
 
-    @Override
     public void deleteById(Long id) throws SQLException {
         Optional<Course> entity = findById(id);
         if (entity.isPresent()) {
-            em.remove(entity.get());
+            courseRepository.deleteById(id);
         } else throw new SQLException("Course with id="+ id + " doesn't exist");
     }
 
-    @Override
     public List<Student> findRelatedStudents(Long id) throws SQLException {
         Optional<Course> entity = findById(id);
         if (entity.isPresent()) {
