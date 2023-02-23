@@ -1,7 +1,7 @@
 package com.foxminded.school.service;
 
 import com.foxminded.school.dao.StudentDao;
-import com.foxminded.school.dao.jdbc.JDBCStudentDao;
+import com.foxminded.school.dao.jdbc.JPAStudentDao;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
 import org.springframework.stereotype.Service;
@@ -14,44 +14,44 @@ import java.util.Optional;
 @Service
 public class StudentService implements StudentDao {
 
-    private final JDBCStudentDao jdbcStudentDao;
+    private final JPAStudentDao jpaStudentDao;
 
-    public StudentService(JDBCStudentDao jdbcStudentDao) {
-        this.jdbcStudentDao = jdbcStudentDao;
+    public StudentService(JPAStudentDao jpaStudentDao) {
+        this.jpaStudentDao = jpaStudentDao;
     }
 
     @Transactional
     public Student save(Student student) throws SQLException {
-        return jdbcStudentDao.save(student);
+        return jpaStudentDao.save(student);
     }
 
     @Transactional(readOnly = true)
     public Optional<Student> findById(Long id) {
-        return jdbcStudentDao.findById(id);
+        return jpaStudentDao.findById(id);
     }
 
     @Transactional(readOnly = true)
     public List<Student> findAll() {
-        return jdbcStudentDao.findAll();
+        return jpaStudentDao.findAll();
     }
 
     @Transactional
     public void deleteById(Long id) throws SQLException {
-        jdbcStudentDao.deleteById(id);
+        jpaStudentDao.deleteById(id);
     }
 
     @Transactional(readOnly = true)
     public List<Course> findRelatedCourses(Long id) {
-        return jdbcStudentDao.findRelatedCourses(id);
+        return jpaStudentDao.findRelatedCourses(id);
     }
 
     @Transactional
     public void addCourse(Long studentId, Long courseId) throws SQLException {
-        jdbcStudentDao.addCourse(studentId, courseId);
+        jpaStudentDao.addCourse(studentId, courseId);
     }
 
     @Transactional
-    public void deleteCourse(Long studentId, Long courseId) {
-        jdbcStudentDao.deleteCourse(studentId, courseId);
+    public void removeCourse(Long studentId, Long courseId) throws SQLException {
+        jpaStudentDao.removeCourse(studentId, courseId);
     }
 }

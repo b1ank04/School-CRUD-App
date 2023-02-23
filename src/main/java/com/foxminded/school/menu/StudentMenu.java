@@ -89,7 +89,7 @@ public class StudentMenu implements SubMenu {
                 Long studentId = Long.parseLong(console.readString());
                 console.println("Course ID:");
                 Long courseId = Long.parseLong(console.readString());
-                studentService.deleteCourse(studentId, courseId);
+                studentService.removeCourse(studentId, courseId);
                 console.println("Successfully deleted");
             }
             default -> console.println("Wrong method");

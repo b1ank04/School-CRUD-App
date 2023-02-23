@@ -1,5 +1,6 @@
 package com.foxminded.school.menu;
 
+import com.foxminded.school.database.DatabaseService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
@@ -14,14 +15,17 @@ public class ConsoleMenu implements ApplicationRunner {
 
     private final Console console;
     private final List<SubMenu> subMenus;
+    private final DatabaseService databaseService;
 
-    public ConsoleMenu(Console console, List<SubMenu> subMenus) {
+    public ConsoleMenu(Console console, List<SubMenu> subMenus, DatabaseService databaseService) {
         this.console = console;
         this.subMenus = subMenus;
+        this.databaseService = databaseService;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        databaseService.execute();
         while (true) {
             console.println("Choose dao:");
             subMenus.forEach(menu -> console.println(menu.getTitle()));

@@ -1,53 +1,48 @@
 package com.foxminded.school.dao.jdbc;
 
-import com.foxminded.school.dao.GroupDao;
 import com.foxminded.school.model.group.Group;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@JdbcTest
+@DataJpaTest(includeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = {JPAGroupDao.class})})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(
         scripts = {"/sql/clear_tables.sql", "/sql/sample_data.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
 )
-class JDBCGroupDaoTest {
+class JPAGroupDaoTest {
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-    private GroupDao dao;
+    private JPAGroupDao dao;
 
-    @BeforeEach
-    void setUp() {
-        dao = new JDBCGroupDao(jdbcTemplate);
-    }
 
     @Test
-    void shouldFindById() throws SQLException {
+    void shouldFindById() {
         Group group = new Group(1000L, "TEST");
         assertEquals(Optional.of(group), dao.findById(1000L));
     }
 
     @Test
-    void shouldNotFindById() throws SQLException {
+    void shouldNotFindById() {
         assertEquals(Optional.empty(), dao.findById(999L));
     }
 
     @Test
-    void shouldFindAll() throws SQLException {
-        assertEquals(List.of(new Group(1000L, "TEST"),
-                new Group(500L, "TEST1")), dao.findAll());
+    void shouldFindAll() {
+        assertEquals(new HashSet<>(List.of(new Group(1000L, "TEST"),
+                new Group(500L, "TEST1"))), new HashSet<>(dao.findAll()));
     }
 
     @Test
@@ -66,7 +61,7 @@ class JDBCGroupDaoTest {
     @Test
     void shouldNotDeleteById() {
         Exception thrown = assertThrows(SQLException.class, () -> dao.deleteById(123L));
-        assertEquals("Group doesn't exist", thrown.getMessage());
+        assertEquals("Group with id=123 doesn't exist", thrown.getMessage());
     }
 
     @Test
@@ -83,6 +78,6 @@ class JDBCGroupDaoTest {
     @Test
     void shouldNotUpdate() {
         Exception thrown = assertThrows(SQLException.class, () -> dao.save(new Group(123L, "fail")));
-        assertEquals("Group doesn't exist", thrown.getMessage());
+        assertEquals("Group with id=123 doesn't exist", thrown.getMessage());
     }
 }

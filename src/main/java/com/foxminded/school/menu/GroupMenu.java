@@ -33,8 +33,8 @@ public class GroupMenu implements SubMenu {
                 long id = Long.parseLong(console.readString());
                 console.println("Name:");
                 String name = console.readString();
-                Group course = new Group(id == 0 ? null : id, name);
-                console.println(groupService.save(course).toString());
+                Group group = new Group(id == 0 ? null : id, name);
+                console.println(groupService.save(group).toString());
             }
             case ("find") -> {
                 console.println("ID:");
