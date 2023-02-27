@@ -1,7 +1,7 @@
 package com.foxminded.school.service;
 
-import com.foxminded.school.repository.jpa.JPAGroupRepository;
 import com.foxminded.school.model.group.Group;
+import com.foxminded.school.repository.GroupRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,29 +12,32 @@ import java.util.Optional;
 @Service
 public class GroupService {
 
-    private final JPAGroupRepository jpaGroupRepository;
+    private final GroupRepository groupRepository;
 
-    public GroupService(JPAGroupRepository jpaGroupRepository) {
-        this.jpaGroupRepository = jpaGroupRepository;
+    public GroupService(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
 
     @Transactional
-    public Group save(Group group) throws SQLException {
-        return jpaGroupRepository.save(group);
+    public Group save(Group group) {
+        return groupRepository.save(group);
     }
 
     @Transactional(readOnly = true)
     public Optional<Group> findById(Long id) {
-        return jpaGroupRepository.findById(id);
+        return groupRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
     public List<Group> findAll() {
-        return jpaGroupRepository.findAll();
+        return groupRepository.findAll();
     }
 
     @Transactional
     public void deleteById(Long id) throws SQLException {
-        jpaGroupRepository.deleteById(id);
+        Optional<Group> entity = findById(id);
+        if (entity.isPresent()) {
+            groupRepository.deleteById(id);
+        } else throw new SQLException("Group with id="+ id + " doesn't exist");
     }
 }

@@ -1,8 +1,8 @@
 package com.foxminded.school.service;
 
-import com.foxminded.school.repository.jpa.JPACourseRepository;
 import com.foxminded.school.model.course.Course;
 import com.foxminded.school.model.student.Student;
+import com.foxminded.school.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,34 +13,37 @@ import java.util.Optional;
 @Service
 public class CourseService{
 
-    private final JPACourseRepository jpaCourseRepository;
+    private final CourseRepository courseRepository;
 
-    public CourseService(JPACourseRepository jpaCourseRepository) {
-        this.jpaCourseRepository = jpaCourseRepository;
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
     }
 
     @Transactional
-    public Course save(Course course) throws SQLException {
-        return jpaCourseRepository.save(course);
+    public Course save(Course course) {
+        return courseRepository.save(course);
     }
 
     @Transactional(readOnly = true)
     public Optional<Course> findById(Long id) {
-        return jpaCourseRepository.findById(id);
+        return courseRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
     public List<Course> findAll() {
-        return jpaCourseRepository.findAll();
+        return courseRepository.findAll();
     }
 
     @Transactional
     public void deleteById(Long id) throws SQLException {
-        jpaCourseRepository.deleteById(id);
+        Optional<Course> entity = findById(id);
+        if (entity.isPresent()) {
+            courseRepository.deleteById(id);
+        } else throw new SQLException("Course with id="+ id + " doesn't exist");
     }
 
     @Transactional(readOnly = true)
-    public List<Student> findRelatedStudents(Long id) throws SQLException {
-        return jpaCourseRepository.findRelatedStudents(id);
+    public List<Student> findRelatedStudents(Long id) {
+        return courseRepository.findRelatedStudents(id);
     }
 }

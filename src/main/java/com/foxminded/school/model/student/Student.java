@@ -4,7 +4,6 @@ import com.foxminded.school.model.course.Course;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,19 +56,5 @@ public class Student {
         this.firstName = firstName;
         this.lastName = lastName;
         this.courses = courses;
-    }
-
-    public void addCourse(Course course) throws SQLException {
-        if (!getCourses().contains(course)) {
-            course.getStudents().add(this);
-            getCourses().add(course);
-        } else throw new SQLException("Course with id="+ course.getId() + " was added before");
-    }
-
-    public void removeCourse(Course course) throws SQLException {
-        if (getCourses().contains(course)) {
-            course.getStudents().remove(this);
-            getCourses().remove(course);
-        } else throw new SQLException("Course with id =" + course.getId() + " wasn't added before");
     }
 }
