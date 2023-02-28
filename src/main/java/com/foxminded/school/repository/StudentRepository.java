@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
-    @Modifying
     @Query("""
                                     SELECT c FROM Course c
                                     JOIN c.students s
